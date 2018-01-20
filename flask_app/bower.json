@@ -2,7 +2,7 @@
   "name": "flask-stock-visualizer",
   "version": "0.0.0",
   "authors": [
-    "Michael Herman <michael@realpython.com>"
+    "Nitin Nataraj"
   ],
   "main": "app.py",
   "license": "MIT",
@@ -12,11 +12,14 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    "static/bower_components"
   ],
   "dependencies": {
     "bootstrap": "3.2.0",
     "jquery": "2.1.1",
     "d3": "3.4.11"
-  }
+  },
+  "description": "",
+  "homepage": ""
 }

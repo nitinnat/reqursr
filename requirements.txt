@@ -1,0 +1,2 @@
+VCPython27 - http://aka.ms/vcpython27
+beautifulsoup

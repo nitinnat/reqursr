@@ -1,6 +1,10 @@
-from flask import Flask, render_template, jsonify
-from stock_scraper import get_data
-import os
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Jan 20 00:07:25 2018
+
+@author: Nitin
+"""
+
 from bs4 import BeautifulSoup
 import requests
 import json
@@ -68,7 +72,7 @@ def BFS(query):
     s = start_link
     print(s)
     queue.append(s)
-    existing_ents = set()
+    existing_ents = {}
     while queue and count <= 2:
         s = queue.pop(0)
         if s != None and '#' not in s:
@@ -95,22 +99,8 @@ def BFS(query):
             
     return queue,link_dic
 
+a,b = BFS("algorithms")
 
 
-app = Flask(__name__)
-
-
-@app.route("/data/<query>",methods=['GET'])
-def data(query):
-    op = BFS(query)
-    return jsonify(get_data())
-
-
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    
+        
