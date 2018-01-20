@@ -69,38 +69,73 @@ def BFS(query):
     
     link_dic = defaultdict(dict)
     titles = []
-    s = start_link
+    s = (query.lower(), start_link)
     print(s)
+    
+    existing_ents = set()
+    links = [] #source-target pair
+    nodes = {} #name - group pair
+    group_num = 0
+    nodes[query.lower()] = 0
     queue.append(s)
-    existing_ents = {}
+    existing_ents.add(query.lower())
+    
+    
     while queue and count <= 2:
         s = queue.pop(0)
-        if s != None and '#' not in s:
-            print("Scraping: " +str(s))
+        
+        if s[1] != None and '#' not in s[1]:
+            print("Scraping: " +str(s[0]))
             
-            title, text= scrape_wiki_link(s)
+            title, text= scrape_wiki_link(s[1])
+            
+            #Add this entity to the nodes list if it doesn't exist
+            if not s[0].lower() in nodes.keys():
+                group_num += 1
+                nodes[s[0]] = group_num
+                existing_ents.add(s[0].lower())
+                
+            
+            #Find entities
             entities = google_nlp(text)
             titles.append(title)
             print("Title: " + str(title))            
             link_dic[count]['text'] = text
             link_dic[count]['entities'] = entities
             print(entities)
+            ##Add to the parent_Child_Rel dictionary
+            print("Adding parent %s and its children to the relationship dictionary"%title)
+
             if entities:
                 for ent in [e for e in entities if not e in existing_ents]:
                     try:
                         temp_link = json.loads(requests.get(wiki_api_link + ent).content)[3][0]
-                        queue.append(temp_link)
-                        #print("Appending " + temp_link)
-                        #Add to hashmap
-                        existing_ents.add(ent)
+                        queue.append((ent,temp_link))
+
+                        #Add to nodes
+                        if not ent in nodes.keys():
+                            group_num += 1
+                            nodes[ent] = group_num
+                            existing_ents.add(ent)
+                            print("Added %s as %d"%(ent,group_num))
+                            
+                        #Add to links
+                        links.append({"source" : nodes[s[0]], "target": group_num})
+                        
                     except IndexError:
                         continue
                 count += 1
             
-    return queue,link_dic
+    return queue,link_dic,nodes,links
 
-a,b = BFS("algorithms")
-
-
+def get_graph_data(query):
+    a,b,node_dic,links = BFS(query.lower())
+    nodes = []
+    for n in node_dic.keys():
+        nodes.append({"name":n,"group":node_dic[n]})
+    my_json = {"nodes": nodes, "links": links}
+    with open('graph.json', 'w') as fp:
+        json.dump(my_json, fp)
+    return my_json
     
         

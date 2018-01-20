@@ -8,66 +8,58 @@ $(function() {
 
 function createGraph() {
 
-  // main config
-  var width = 960; // chart width
-  var height = 700; // chart height
-  var format = d3.format(",d");  // convert value to integer
-  var color = d3.scale.category20b();  // create ordial scale with 20 colors
-  var sizeOfRadius = d3.scale.pow().domain([-100,100]).range([-50,50]);  // https://github.com/mbostock/d3/wiki/Quantitative-Scales#pow
+ 
 
-  // bubble config
-  var bubble = d3.layout.pack()
-    .sort(null)  // disable sorting, use DOM tree traversal
-    .size([width, height])  // chart layout size
-    .padding(1)  // padding between circles
-    .radius(function(d) { return 20 + (sizeOfRadius(d) * 60); });  // radius for each circle
 
-  // svg config
-  var svg = d3.select("#chart").append("svg") // append to DOM
+var width = 960,
+    height = 500
+
+var svg = d3.select("body").append("svg")
     .attr("width", width)
-    .attr("height", height)
-    .attr("class", "bubble");
+    .attr("height", height);
 
-  // tooltip config
-  var tooltip = d3.select("body")
-    .append("div")
-    .style("position", "absolute")
-    .style("z-index", "10")
-    .style("visibility", "hidden")
-    .style("color", "white")
-    .style("padding", "8px")
-    .style("background-color", "rgba(0, 0, 0, 0.75)")
-    .style("border-radius", "6px")
-    .style("font", "12px sans-serif")
-    .text("tooltip");
+var force = d3.layout.force()
+    .gravity(.05)
+    .distance(100)
+    .charge(-100)
+    .size([width, height]);
 
-  // request the data
-  d3.json("/data", function(error, quotes) {
-    console.log(quotes)
-    var node = svg.selectAll('.node')
-      .data(bubble.nodes(quotes).filter(function(d) { return !d.children; }))
-      .enter().append('g')
-      .attr('class', 'node')
-      .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'});
+d3.json("graph.json", function(json) {
+  force
+      .nodes(json.nodes)
+      .links(json.links)
+      .start();
+
+  var link = svg.selectAll(".link")
+      .data(json.links)
+    .enter().append("line")
+      .attr("class", "link")
+    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
+
+  var node = svg.selectAll(".node")
+      .data(json.nodes)
+    .enter().append("g")
+      .attr("class", "node")
+      .call(force.drag);
 
   node.append("circle")
-    .attr("r", function(d) { return d.r; })
-    .style('fill', function(d) { return color(d.symbol); })
+      .attr("r","5");
 
-    .on("mouseover", function(d) {
-      tooltip.text(d.name + ": $" + d.price);
-      tooltip.style("visibility", "visible");
-    })
-    .on("mousemove", function() {
-      return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
-    })
-    .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+  node.append("text")
+      .attr("dx", 12)
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name });
 
-    node.append('text')
-      .attr("dy", ".3em")
-      .style('text-anchor', 'middle')
-      .text(function(d) { return d.symbol; });
+  force.on("tick", function() {
+    link.attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
 
+    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
   });
+});
+
+
 
 }
