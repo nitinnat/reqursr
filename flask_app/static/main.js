@@ -24,7 +24,9 @@ var force = d3.layout.force()
     .charge(-100)
     .size([width, height]);
 
-d3.json("graph.json", function(json) {
+d3.json("/data/" + query, function(error,data) {
+  if (error) return console.warn(error);
+  console.log(data);
   force
       .nodes(json.nodes)
       .links(json.links)

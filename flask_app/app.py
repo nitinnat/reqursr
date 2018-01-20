@@ -65,14 +65,14 @@ def scrape_wiki_link(link):
 
 def BFS(query):
     start_link = json.loads(requests.get(wiki_api_link + query).content)[3][0]
-    print(start_link)
+    #print(start_link)
     count = 0
     queue = []
     
     link_dic = defaultdict(dict)
     titles = []
     s = (query.lower(), start_link)
-    print(s)
+    #print(s)
     
     existing_ents = set()
     links = [] #source-target pair
@@ -101,10 +101,10 @@ def BFS(query):
             #Find entities
             entities = google_nlp(text)
             titles.append(title)
-            print("Title: " + str(title))            
+            #print("Title: " + str(title))            
             link_dic[count]['text'] = text
             link_dic[count]['entities'] = entities
-            print(entities)
+            #print(entities)
             ##Add to the parent_Child_Rel dictionary
             print("Adding parent %s and its children to the relationship dictionary"%title)
 
@@ -119,7 +119,7 @@ def BFS(query):
                             group_num += 1
                             nodes[ent] = group_num
                             existing_ents.add(ent)
-                            print("Added %s as %d"%(ent,group_num))
+                            #print("Added %s as %d"%(ent,group_num))
                             
                         #Add to links
                         links.append({"source" : nodes[s[0]], "target": group_num})
@@ -148,7 +148,8 @@ app = Flask(__name__)
 
 @app.route("/data/<query>",methods=['GET'])
 def data(query):
-    return jsonify(get_graph_data(query))
+    response = get_graph_data(query)
+    return jsonify({"data":response, "type":str(type(response))})
 
 
 @app.route("/")
