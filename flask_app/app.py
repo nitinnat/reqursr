@@ -144,9 +144,9 @@ def get_graph_data(query):
 app = Flask(__name__)
 
 
-@app.route("/data/<query>",methods=['GET'])
-def data(query):
-    response = get_graph_data(query)
+@app.route("/data/",methods=['GET'])
+def data():
+    response = get_graph_data("machine learning")
     return jsonify(response)
 
 
