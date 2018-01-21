@@ -14,7 +14,7 @@ from flask import request
 import os
 
 from flask import render_template, redirect, url_for, request
-
+from nltk import pos_tag
 base_link = "https://en.wikipedia.org"
 link = "/wiki/Computer_vision"
 wiki_api_link = "https://en.wikipedia.org/w/api.php?format=json&action=opensearch&search="
@@ -47,8 +47,8 @@ def scrape_wiki_link(link):
     title = tempsoup.find_all('title')
     text = ''
     
-    for wrapper in p[0:5]:
-        
+    for wrapper in p[0:4]:
+        print("Mowing through p tags...")
         """
         children = wrapper.find_all('a')        
         for c in children:
@@ -82,7 +82,7 @@ def BFS(query):
 
     
     
-    while queue and count <= 4:
+    while queue and count <= 1:
         print(count)
         s = queue.pop(0)
         
@@ -104,6 +104,7 @@ def BFS(query):
             
             #Find entities
             entities = google_nlp(text)
+            #Pos tag it as well
             
             #Remove duplicates and convert to lowercase
             entities = list(set(ent.lower() for ent in entities))
@@ -137,6 +138,7 @@ def get_graph_data(query):
     queue, nodes,links = BFS(query.lower())
     node_list = []
     for n in nodes.keys():
+        print("Scraping from links...")
         node_list.append({"id":n,"group":nodes[n], "text": scrape_extract(n)[1]})
     my_json = {"nodes": node_list, "links": links}
     with open('graph.json', 'w') as fp:
