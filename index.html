@@ -16,12 +16,12 @@
         <div id="mydiv">
         <div class="col-md-6">
             <h2>ReqursR</h2>
-            <form action="./hello.html" method="post">
+            <form action="#" onsubmit="generateConceptMap();" method="post">
             <div id="custom-search-input" class="form-group">
                 <div class="input-group col-md-12">
-                    <input type="text" class="form-control" placeholder="Enter a topic name" />
+                    <input type="text" id="topic_text" class="form-control" placeholder="Enter a topic name" />
                     
-                        <button class="btn btn-info btn-lg" type="submit">
+                        <button class="btn btn-info btn-lg" type="submit" id="go_button">
                             Go
                         </button>
                     
@@ -45,6 +45,16 @@
         text: 'Thumbnail'
       });
     </script>
+
+<script type="text/javascript">
+    function generateConceptMap() {
+        var topic = document.getElementById("topic_text").value;
+        var linkToGraph = "http://localhost:5000/data/" + "topic"
+        alert("calling " + linkToGraph);
+        window.open(linkToGraph,"_self")
+    }
+
+</script>
 
 </body>
 </html>.
