@@ -5,6 +5,7 @@ To run:
 <ul>
 <li>Install beautifulsoup and flask </li>
 <li> Navigate to the correct directory and run "python app.py" </li>
+<li> Go to localhost:5000 to interact with the application!</li>
 </ul>
 
 </br>
