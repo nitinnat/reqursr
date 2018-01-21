@@ -1,6 +1,15 @@
 # reqursr - the recursive concept generator
 
 <br>
+To run:
+<ul>
+<li>Install beautifulsoup and flask </li>
+<li> Navigate to the correct directory and run "python app.py" </li>
+</ul>
+
+</br>
+
+<br>
 Inspiration: Getting into any new subject is a daunting task, especially in ever expanding and rapidly changing fields like machine learning. We have all faced an initial overwhelming option paralysis when starting out, not knowing where to begin or how the different concepts relate to each other. So we wanted to create an application that took any topic as a query and created a concept map of all the important topics and ideas that it was connected to. This not only gives the user a good picture of what the subject entails, but also a roadmap to learning it.
 </br>
 
