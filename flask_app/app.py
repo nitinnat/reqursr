@@ -10,8 +10,11 @@ Created on Sat Jan 20 00:07:25 2018
 from bs4 import BeautifulSoup
 import requests
 import json
-
+from flask import request
 import os
+from flask import Flask
+from flask import request
+from flask import render_template, redirect, url_for, request
 
 base_link = "https://en.wikipedia.org"
 link = "/wiki/Computer_vision"
@@ -147,6 +150,7 @@ app = Flask(__name__)
 @app.route("/data/<query>",methods=['GET','POST'])
 def data(query):
     response = get_graph_data(query)
+    
     print(query,type(query))
     return jsonify(response)
 
@@ -154,6 +158,10 @@ def data(query):
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/viz/<num>",methods=['GET','POST'])
+def viz(num):
+    return render_template("viz.html")
 
 
 if __name__ == '__main__':
