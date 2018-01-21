@@ -12,11 +12,16 @@
   stroke-width: 1.5px;
 }
 
+.node text {
+  pointer-events: none;
+  font: 10px sans-serif;
+}
+
 div.tooltip {
   position: absolute;
   text-align: center;
   width: 60px;
-  height: 28px;
+  height: 40px;
   padding: 2px;
   font: 12px sans-serif;
   background: lightsteelblue;
@@ -24,10 +29,32 @@ div.tooltip {
   border-radius: 8px;
   pointer-events: none;
 }
+
+#page {
+    display: none;
+}
+#loading {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(192, 192, 192, 0.5);
+    background-image: url("http://i.stack.imgur.com/MnyxU.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+}
 </style>
 <svg width="960" height="600"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.3.0.min.js"
+  integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4="
+  crossorigin="anonymous"></script>
 <script>
+
 
 var topic = localStorage.getItem("storageName");
 
@@ -39,22 +66,24 @@ var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
+
 var color = d3.scaleOrdinal(d3.schemeCategory20);
 
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.group; }))
-    .force("charge", d3.forceManyBody())
+    .force("charge", d3.forceManyBody().strength(-50))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
 d3.json("http://localhost:5000/data/" + topic,  function(error, graph) {
   if (error) throw error;
-
+  
   var link = svg.append("g")
       .attr("class", "links")
     .selectAll("line")
     .data(graph.links)
     .enter().append("line")
       .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+    
 
   var node = svg.append("g")
       .attr("class", "nodes")
@@ -63,6 +92,8 @@ d3.json("http://localhost:5000/data/" + topic,  function(error, graph) {
     .enter().append("circle")
       .attr("r", 10)
       .attr("fill", function(d) { return color(d.group); })
+      .attr( 'width', 200 )
+      .attr( 'height', 200 )
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
@@ -81,16 +112,19 @@ d3.json("http://localhost:5000/data/" + topic,  function(error, graph) {
          .style("opacity", 0);
        });
 
-  node.append("title")
-      .text(function(d) { return d.id; });
+ // node.append("title")
+   //   .text(function(d) { return d.text; });
   
-
+  
   simulation
       .nodes(graph.nodes)
       .on("tick", ticked);
 
   simulation.force("link")
-      .links(graph.links);
+      .links(graph.links)
+      .distance(10)
+      .strength(0.1);
+      
 
   function ticked() {
     link
@@ -105,6 +139,7 @@ d3.json("http://localhost:5000/data/" + topic,  function(error, graph) {
 
 
   }
+ 
 });
 
 function dragstarted(d) {

@@ -12,8 +12,7 @@ import requests
 import json
 from flask import request
 import os
-from flask import Flask
-from flask import request
+
 from flask import render_template, redirect, url_for, request
 
 base_link = "https://en.wikipedia.org"
@@ -48,7 +47,7 @@ def scrape_wiki_link(link):
     title = tempsoup.find_all('title')
     text = ''
     
-    for wrapper in p[0:3]:
+    for wrapper in p[0:5]:
         
         """
         children = wrapper.find_all('a')        
@@ -76,14 +75,15 @@ def BFS(query):
     nodes = {} #name - group pair
     s = (query.lower(), start_link)
     group_num = 0
+    parent_num = 0
     nodes[unicode(query.lower())] = group_num
     queue.append(s)
     
 
     
     
-    while queue and count <= 2:
-        
+    while queue and count <= 4:
+        print(count)
         s = queue.pop(0)
         
         if s[1] != None and '#' not in s[1]:            
@@ -94,6 +94,7 @@ def BFS(query):
                 print("Adding again")
                 group_num += 1
                 nodes[s[0].lower()] = group_num
+                
             
             #Add link
             temp_link = {"source" : nodes[s[0].lower()], "target": group_num,"value": 1}
@@ -110,6 +111,7 @@ def BFS(query):
             
             #If entities exist, then append to queue
             if entities:
+                
                 for ent in [e for e in entities if not e in nodes.keys()]:
                     try:
                         temp_link = json.loads(requests.get(wiki_api_link + ent).content)[3][0]
@@ -135,7 +137,7 @@ def get_graph_data(query):
     queue, nodes,links = BFS(query.lower())
     node_list = []
     for n in nodes.keys():
-        node_list.append({"id":n,"group":nodes[n]})
+        node_list.append({"id":n,"group":nodes[n], "text": scrape_extract(n)[1]})
     my_json = {"nodes": node_list, "links": links}
     with open('graph.json', 'w') as fp:
         json.dump(my_json, fp)
